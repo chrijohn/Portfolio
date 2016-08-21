@@ -46,9 +46,9 @@ namespace ResturantReviewsAPI.Controllers
             TableQuery<Models.Accounts> query = new TableQuery<Models.Accounts>().Where
                 (TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, id));
 
-            var teams = table.ExecuteQuery(query).AsQueryable();
+            var accounts = table.ExecuteQuery(query).AsQueryable();
 
-            return teams;
+            return accounts;
         }
 
 
@@ -69,7 +69,7 @@ namespace ResturantReviewsAPI.Controllers
 
             TableOperation insertOperation = TableOperation.Insert(account);
 
-            // Check if new event is valid, if not, send error
+            // Check if new account is valid, if not, send error
             if (ModelState.IsValid)
             {
                 //Query database for new event, if in database, add as new
@@ -78,9 +78,9 @@ namespace ResturantReviewsAPI.Controllers
                 TableResult retirevedResult = table.Execute(retrieveOperation);
 
                 Models.Accounts result = (Models.Accounts)retirevedResult.Result;
+                // If valid account and not in database, enter into db. Else print error
                 if (result == null)
                 {
-                    // If valid event and not in database, enter into db
                     table.Execute(insertOperation);
                     return Request.CreateResponse(HttpStatusCode.OK);
                 }
@@ -112,10 +112,10 @@ namespace ResturantReviewsAPI.Controllers
 
             CloudTable table = tableClient.GetTableReference("Accounts");
 
-            // Check if eventis valid, if not, send error
+            // Check if account is valid, if not, send error
             if (ModelState.IsValid)
             {
-                //Query database for new event, if in database, add as new
+                //Query database for new account, if in database, add as new
                 TableOperation retrieveOperation = TableOperation.Retrieve<Models.Accounts>(account.PartitionKey, account.RowKey);
 
                 TableResult retirevedResult = table.Execute(retrieveOperation);
@@ -129,7 +129,7 @@ namespace ResturantReviewsAPI.Controllers
                     table.Execute(insertOperation);
                     return Request.CreateResponse(HttpStatusCode.OK);
                 }
-                else // update event
+                else // update account
                 {
                     result.username = account.username;
                     result.password = account.password;

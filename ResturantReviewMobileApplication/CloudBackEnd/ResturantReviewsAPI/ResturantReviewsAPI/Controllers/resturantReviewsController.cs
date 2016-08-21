@@ -25,9 +25,9 @@ namespace ResturantReviewsAPI.Controllers
 
             TableQuery<Models.restReviews> query = new TableQuery<Models.restReviews>();
 
-            var teams = table.ExecuteQuery(query).AsQueryable();
+            var reviews = table.ExecuteQuery(query).AsQueryable();
 
-            return teams;
+            return reviews;
         }
         public IQueryable<Models.restReviews> Get(string id)
         {
@@ -81,7 +81,7 @@ namespace ResturantReviewsAPI.Controllers
 
             TableOperation insertOperation = TableOperation.Insert(review);
 
-            // Check if new team is valid, if not, send error
+            // Check if new review is valid, if not, send error
             if (ModelState.IsValid)
             {
                 TableOperation retrieveOperation = TableOperation.Retrieve<Models.restReviews>(review.username, review.restName);
@@ -91,7 +91,7 @@ namespace ResturantReviewsAPI.Controllers
                 Models.restReviews reviews = (Models.restReviews)retirevedResult.Result;
                 if (reviews == null)
                 {
-                    // If valid team and not in database, enter into db
+                    // If valid review and not in database, enter into db
                     table.Execute(insertOperation);
                     return Request.CreateResponse(HttpStatusCode.OK);
                 }
@@ -123,10 +123,10 @@ namespace ResturantReviewsAPI.Controllers
 
             CloudTable table = tableClient.GetTableReference("restReviews");
 
-            // Check if new team is valid, if not, send error
+            // Check if new review is valid, if not, send error
             if (ModelState.IsValid)
             {
-                //Query database for new team number, if in database, add as new
+                //Query database for new review, if in database, add as new
                 TableOperation retrieveOperation = TableOperation.Retrieve<Models.restReviews>(review.PartitionKey, review.RowKey);
 
                 TableResult retirevedResult = table.Execute(retrieveOperation);
@@ -175,15 +175,15 @@ namespace ResturantReviewsAPI.Controllers
 
             TableResult retirevedResult = table.Execute(retrieveOperation);
 
-            Models.restReviews deletedTeam = (Models.restReviews)retirevedResult.Result;
+            Models.restReviews deletedReview = (Models.restReviews)retirevedResult.Result;
 
-            if (deletedTeam == null)
+            if (deletedReview == null)
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, "Review not in db");
             }
             else
             {
-                TableOperation deleteOperation = TableOperation.Delete(deletedTeam);
+                TableOperation deleteOperation = TableOperation.Delete(deletedReview);
 
                 table.Execute(deleteOperation);
                 return Request.CreateResponse(HttpStatusCode.OK);
